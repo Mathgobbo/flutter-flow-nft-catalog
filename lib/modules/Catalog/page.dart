@@ -3,10 +3,25 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FclController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/components/CatalogTabBar.dart';
+import 'package:get/get.dart';
 
-class Catalog extends StatelessWidget {
+class Catalog extends StatefulWidget {
   const Catalog({super.key});
+
+  @override
+  State<Catalog> createState() => _CatalogState();
+}
+
+class _CatalogState extends State<Catalog> {
+  final FCLController controller = Get.find();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    controller.getCatalog();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +29,7 @@ class Catalog extends StatelessWidget {
       const SizedBox(
         height: 24,
       ),
+      Obx(() => Text(controller.catalog.value)),
       const Text(
         "View Catalog",
         style: TextStyle(

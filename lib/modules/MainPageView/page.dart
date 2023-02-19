@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FclController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/MainPageView/controller.dart';
 import 'package:flutter_flow_nft_catalog/modules/shared/AppBarTitle.dart';
@@ -13,6 +14,7 @@ class MainPageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(FCLController());
     PageViewController controller = Get.put(PageViewController());
     return Scaffold(
         appBar: AppBar(
