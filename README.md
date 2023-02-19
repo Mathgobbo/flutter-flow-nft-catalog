@@ -1,16 +1,9 @@
-# flutter_flow_nft_catalog
+# Flutter Flow NFT Catalog
 
-A new Flutter project.
+This project is being built or the Flow Hackathon (February/2023).
 
-## Getting Started
+We are extending the Flow NFT Catalog to a mobile native version!
+We are using Flutter.
+To query the blockchain and use the NFT Catalog contract, we are using the Swift-FCL SDK!
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+In this app you can view the catalog and query for all NFTs of an account.
