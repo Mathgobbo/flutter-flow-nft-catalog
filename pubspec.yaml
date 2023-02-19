@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   get:
   flutter_svg: ^2.0.1
+  flutter_feather_icons: ^2.0.0
+
 
 
 dev_dependencies:

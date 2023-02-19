@@ -6,7 +6,5 @@ import 'package:get/get.dart';
 void main() => runApp(GetMaterialApp(
       initialRoute: "/",
       getPages: routes,
-      theme: ThemeData(
-        fontFamily: 'Termina',
-      ),
+      theme: ThemeData(),
     ));
