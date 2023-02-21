@@ -3,7 +3,9 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/components/CollectionCard.dart';
+import 'package:get/get.dart';
 
 class CatalogTabBar extends StatefulWidget {
   const CatalogTabBar({super.key});
@@ -30,6 +32,8 @@ class _CatalogTabBarState extends State<CatalogTabBar>
 
   @override
   Widget build(BuildContext context) {
+    final FCLController controller = Get.find();
+
     return Column(
       children: [
         TabBar(
@@ -56,13 +60,19 @@ class _CatalogTabBarState extends State<CatalogTabBar>
             child: TabBarView(controller: _tabController, children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemBuilder: (context, int) => const CollectionCard(),
-              separatorBuilder: (context, index) => const SizedBox(
-                height: 12,
-              ),
-              itemCount: 10,
+            child: Obx(
+              () => controller.catalog.length > 0
+                  ? ListView.separated(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) => CollectionCard(
+                        collection: controller.catalog[index],
+                      ),
+                      separatorBuilder: (context, index) => const SizedBox(
+                        height: 12,
+                      ),
+                      itemCount: controller.catalog.length,
+                    )
+                  : Text("Loading..."),
             ),
           ),
           Text("Testnet")

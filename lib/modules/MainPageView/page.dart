@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
-import 'package:flutter_flow_nft_catalog/controllers/FclController.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/page.dart';
+import 'package:flutter_flow_nft_catalog/modules/CatalogNavigator/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/MainPageView/controller.dart';
 import 'package:flutter_flow_nft_catalog/modules/shared/AppBarTitle.dart';
 import 'package:get/get.dart';
@@ -41,7 +42,7 @@ class MainPageView extends StatelessWidget {
         body: SafeArea(
           child: PageView(
             controller: controller.pageController,
-            children: const [Home(), Catalog()],
+            children: const [Home(), CatalogNavigator()],
             onPageChanged: controller.onPageChanged,
           ),
         ));

@@ -56,23 +56,18 @@ import FCL
             """
             import NFTCatalog from 0x49a7cda3a1eecc29
 
-            /*
-                The catalog is returned as a `String: NFTCatalogMetadata`
-                The key string is intended to be a unique identifier for a specific collection.
-                The NFTCatalogMetadata contains collection-level views corresponding to each
-                collection identifier.
-                Due to the large size of the response, only the first 10 entries are returned.
-            */
-            pub fun main(): {String: NFTCatalog.NFTCatalogMetadata} {
-                let catalog = NFTCatalog.getCatalog()
-                let keys = catalog.keys.slice(from: 0, upTo: 10)
-                let collections: {String: NFTCatalog.NFTCatalogMetadata} = {}
+            pub fun main(): {String : NFTCatalog.NFTCatalogMetadata} {
+                
+                       let catalog = NFTCatalog.getCatalog()
+                        let keys = catalog.keys.slice(from: 0, upTo: 10)
+                        let collections: {String: NFTCatalog.NFTCatalogMetadata} = {}
 
-                for key in keys {
-                    collections[key] = catalog[key]
-                }
+                        for key in keys {
+                            collections[key] = catalog[key]
+                        }
 
-                return collections
+                        return collections
+            
             }
             """
     private func getCatalog(result: FlutterResult) async {
@@ -86,7 +81,7 @@ import FCL
             result(response)
         }catch {
             print(error)
-            result("Error when running GetCatalog script")
+            result(error.localizedDescription)
         }
     }
     
