@@ -56,27 +56,34 @@ import FCL
             """
             import NFTCatalog from 0x49a7cda3a1eecc29
 
-            pub fun main(): {String : NFTCatalog.NFTCatalogMetadata} {
-                
-                       let catalog = NFTCatalog.getCatalog()
-                        let keys = catalog.keys.slice(from: 0, upTo: 10)
-                        let collections: {String: NFTCatalog.NFTCatalogMetadata} = {}
-
-                        for key in keys {
-                            collections[key] = catalog[key]
+                        pub fun main(batch : [UInt64]?): {String : NFTCatalog.NFTCatalogMetadata} {
+            if(batch == nil){
+            return NFTCatalog.getCatalog()
+                            }
+                            let catalog = NFTCatalog.getCatalog()
+                            let catalogIDs = catalog.keys
+                            var data : {String : NFTCatalog.NFTCatalogMetadata} = {}
+                            var i = batch![0]
+                            while i < batch![1] {
+                                data.insert(key: catalogIDs[i], catalog[catalogIDs[i]]!)
+                                i = i + 1
+                            }
+                            return data
                         }
-
-                        return collections
-            
-            }
             """
     private func getCatalog(result: FlutterResult) async {
         do{
+            
             let response = try await fcl.query {
                             cadence {
                                 getCatalogScript
                             }
+                arguments {
+                    [.array([.uint64(0), .uint64(20)])]
+                }
             }.decode()
+            
+           
             print(response)
             result(response)
         }catch {
