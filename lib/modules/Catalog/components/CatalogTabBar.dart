@@ -20,8 +20,16 @@ class _CatalogTabBarState extends State<CatalogTabBar>
 
   @override
   void initState() {
-    _tabController = new TabController(length: 2, vsync: this);
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController?.addListener(() {
+      final FCLController fclController = Get.find();
+      if (_tabController?.index == 0) {
+        fclController.getMainnetCatalog();
+      } else if (_tabController?.index == 1) {
+        fclController.getTestnetCatalog();
+      }
+    });
   }
 
   @override
@@ -57,26 +65,100 @@ class _CatalogTabBarState extends State<CatalogTabBar>
               )
             ]),
         Expanded(
-            child: TabBarView(controller: _tabController, children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
             child: Obx(
-              () => controller.catalog.length > 0
-                  ? ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) => CollectionCard(
-                        collection: controller.catalog[index],
-                      ),
-                      separatorBuilder: (context, index) => const SizedBox(
-                        height: 12,
-                      ),
-                      itemCount: controller.catalog.length,
-                    )
-                  : Text("Loading..."),
-            ),
-          ),
-          Text("Testnet")
-        ]))
+          () => controller.loadingCatalog.value
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: MainColors.green,
+                  ),
+                )
+              : TabBarView(controller: _tabController, children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 20.0, right: 20, left: 20),
+                    child: controller.presentableCatalog.isNotEmpty
+                        ? ListView.separated(
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Total of Colletions: ${controller.presentableCatalog.length}',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: MainColors.gray),
+                                    ),
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                    CollectionCard(
+                                      collection:
+                                          controller.presentableCatalog[index],
+                                    ),
+                                  ],
+                                );
+                              }
+
+                              return CollectionCard(
+                                collection:
+                                    controller.presentableCatalog[index],
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(
+                              height: 12,
+                            ),
+                            itemCount: controller.presentableCatalog.length,
+                          )
+                        : const Text("No collections found"),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 20.0, right: 20, left: 20),
+                    child: controller.presentableCatalog.isNotEmpty
+                        ? ListView.separated(
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Total of Colletions: ${controller.presentableCatalog.length}',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: MainColors.gray),
+                                    ),
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                    CollectionCard(
+                                      collection:
+                                          controller.presentableCatalog[index],
+                                    ),
+                                  ],
+                                );
+                              }
+
+                              return CollectionCard(
+                                collection:
+                                    controller.presentableCatalog[index],
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(
+                              height: 12,
+                            ),
+                            itemCount: controller.presentableCatalog.length,
+                          )
+                        : const Text("No collections found"),
+                  )
+                ]),
+        ))
       ],
     );
   }

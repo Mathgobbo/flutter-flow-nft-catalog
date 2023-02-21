@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
 import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/components/CatalogTabBar.dart';
 import 'package:get/get.dart';
 
-class Catalog extends StatefulWidget {
+class Catalog extends StatelessWidget {
   const Catalog({super.key});
 
   @override
-  State<Catalog> createState() => _CatalogState();
-}
-
-class _CatalogState extends State<Catalog> {
-  final FCLController controller = Get.find();
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    controller.getCatalog();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final FCLController fclController = Get.find();
     return Column(children: [
       const SizedBox(
         height: 24,
@@ -46,6 +32,8 @@ class _CatalogState extends State<Catalog> {
                 ),
           ),
           child: TextField(
+            onChanged: fclController.filterCatalog,
+            enabled: !fclController.loadingCatalog.value,
             decoration: InputDecoration(
                 prefixIcon: const Icon(
                   FeatherIcons.search,

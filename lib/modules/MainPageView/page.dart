@@ -16,6 +16,7 @@ class MainPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(FCLController());
+
     PageViewController controller = Get.put(PageViewController());
     return Scaffold(
         appBar: AppBar(

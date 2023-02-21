@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/NavigatorKeys.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Collection/controller.dart';
 import 'package:flutter_flow_nft_catalog/types/NFTCatalogMetadata.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,6 +27,7 @@ class Collection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FCLController fclController = Get.find();
     CollectionController controller = Get.find();
     NFTCatalogMetadata? metadata =
         controller.collectionObserver.value.collection;
@@ -220,7 +222,7 @@ class Collection extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () => _launchUrl(
-                  'https://flowscan.org/contract/A.${metadata?.contractAddress}.${metadata?.contractName}'),
+                  'https://${!fclController.isMainnet.value ? "testnet." : ""}flowscan.org/contract/A.${metadata?.contractAddress}.${metadata?.contractName}'),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 decoration: BoxDecoration(
