@@ -63,6 +63,7 @@ class FCLController extends GetxController {
     try {
       isMainnet.value = false;
       await platformChannel.invokeMethod("changeToTestnet");
+      await getCatalog();
     } catch (e) {
       print(e);
     }
@@ -75,6 +76,7 @@ class FCLController extends GetxController {
     try {
       isMainnet.value = true;
       await platformChannel.invokeMethod("changeToMainnet");
+      await getCatalog();
     } catch (e) {
       print(e);
     }
@@ -114,18 +116,6 @@ class FCLController extends GetxController {
       print(e);
     }
     loadingCatalog.toggle();
-  }
-
-  /// Funtion to change to Mainnet and get Catalog
-  getMainnetCatalog() async {
-    await changeToMainnet();
-    await getCatalog();
-  }
-
-  /// Funtion to change to Testnet and get Catalog
-  getTestnetCatalog() async {
-    await changeToTestnet();
-    await getCatalog();
   }
 
   /// Function to get Current user from FCL API and update Local User

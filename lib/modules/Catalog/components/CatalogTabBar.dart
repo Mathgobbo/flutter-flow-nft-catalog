@@ -21,13 +21,16 @@ class _CatalogTabBarState extends State<CatalogTabBar>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    final FCLController fclController = Get.find();
+    _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: fclController.isMainnet.value ? 0 : 1);
     _tabController?.addListener(() {
-      final FCLController fclController = Get.find();
       if (_tabController?.index == 0) {
-        fclController.getMainnetCatalog();
+        fclController.changeToMainnet();
       } else if (_tabController?.index == 1) {
-        fclController.getTestnetCatalog();
+        fclController.changeToTestnet();
       }
     });
   }
