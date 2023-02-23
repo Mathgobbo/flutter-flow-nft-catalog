@@ -5,6 +5,7 @@ import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/CatalogNavigator/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/MainPageView/controller.dart';
+import 'package:flutter_flow_nft_catalog/modules/User/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/shared/AppBarTitle.dart';
 import 'package:get/get.dart';
 
@@ -37,13 +38,15 @@ class MainPageView extends StatelessWidget {
                 BottomNavigationBarItem(
                   icon: Icon(FeatherIcons.book),
                   label: "Catalog",
-                )
+                ),
+                BottomNavigationBarItem(
+                    icon: Icon(FeatherIcons.user), label: "User")
               ]),
         ),
         body: SafeArea(
           child: PageView(
             controller: controller.pageController,
-            children: const [Home(), CatalogNavigator()],
+            children: const [Home(), CatalogNavigator(), UserPage()],
             onPageChanged: controller.onPageChanged,
           ),
         ));

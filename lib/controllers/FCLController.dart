@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_flow_nft_catalog/types/NFTCatalogMetadata.dart';
+import 'package:flutter_flow_nft_catalog/types/User.dart';
 import 'package:get/get.dart';
 
 class FCLController extends GetxController {
@@ -15,9 +18,12 @@ class FCLController extends GetxController {
   final loadingCatalog = false.obs;
   String catalogSearch = "";
 
+  final observableUser = Rxn<User>();
+
   @override
   void onInit() {
     super.onInit();
+    updateFCLCurrentUser();
     getCatalog();
   }
 
@@ -34,8 +40,6 @@ class FCLController extends GetxController {
     setCatalogSarch(value);
     final filteredValue =
         catalog.where((element) => filterCatalogCallback(element, value));
-    print(value);
-    print(filteredValue.length);
     presentableCatalog.addAll(filteredValue);
   }
 
@@ -122,5 +126,38 @@ class FCLController extends GetxController {
   getTestnetCatalog() async {
     await changeToTestnet();
     await getCatalog();
+  }
+
+  /// Function to get Current user from FCL API and update Local User
+  updateFCLCurrentUser() async {
+    //final response = await platformChannel.invokeMethod("getCurrentUser");
+    final response = '{"addr": "0x9bbdjw3", "loggedIn": true, "keyId": 1}';
+    if (response != null)
+      observableUser.value = User.fromJson(jsonDecode(response));
+    else
+      observableUser.value = null;
+    print(observableUser.value);
+  }
+
+  /// Authenticate FCL User!
+  authenticate() async {
+    try {
+      final response = await platformChannel.invokeMethod("authenticate");
+      print(response);
+      updateFCLCurrentUser();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// Authenticate FCL User!
+  unauthenticate() async {
+    try {
+      final response = await platformChannel.invokeMethod("unauthenticate");
+      print(response);
+      updateFCLCurrentUser();
+    } catch (e) {
+      print(e);
+    }
   }
 }

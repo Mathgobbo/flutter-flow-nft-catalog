@@ -18,7 +18,7 @@ import FCL
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-
+    
     /**
      Method to parse the method called by the Flutter application and resolve one of the following funtions
      **/
@@ -43,8 +43,17 @@ import FCL
                     self.initFCL(network: .testnet)
                     result(nil)
                 }
-            }
-            else {
+            }else if(call.method == "getCurrentUser"){
+                self.getCurrentUser(result: result);
+            }else if(call.method == "authenticate") {
+                Task {
+                    await self.authenticateUser(result:result);
+                }
+            }else if(call.method == "unauthenticate") {
+                Task {
+                    await self.unauthenticate(result:result);
+                }
+            } else {
                 result(FlutterMethodNotImplemented)
                 return
             }
@@ -58,12 +67,13 @@ import FCL
      **/
     func initFCL(network: Flow.ChainID) {
         let accountProof = FCL.Metadata.AccountProofConfig(appIdentifier: "Flow Catalog v(0.0)")
-        
+        let walletConnect = FCL.Metadata.WalletConnectConfig(urlScheme: "flowCatalog://", projectID: "c284f5a3346da817aeca9a4e6bc7f935")
         let metadata = FCL.Metadata(appName: "Flow Catalog",
                                     appDescription: "Native Version of the Flow Catalog!",
                                     appIcon: URL(string: "https://placekitten.com/g/200/200")!,
                                     location: URL(string: "https://flow.org")!,
-                                    accountProof: accountProof)
+                                    accountProof: accountProof,
+                                    walletConnectConfig: walletConnect)
         
         fcl.config(metadata: metadata,
                    env: network,
@@ -119,7 +129,7 @@ import FCL
     }
     
     /**
-            Functions to Get total of collections in catalog
+     Functions to Get total of collections in catalog
      */
     private func getCatalogLength(result: FlutterResult) async {
         do{
@@ -127,7 +137,7 @@ import FCL
                 cadence {
                     """
                     import NFTCatalog from 0xNFTCatalog
-
+                    
                     pub fun main(): Int {
                         let catalog = NFTCatalog.getCatalog()
                         let catalogIDs = catalog.keys
@@ -138,6 +148,45 @@ import FCL
             }.decode()
             result(response)
         }catch {
+            print(error)
+            result(error.localizedDescription)
+        }
+    }
+    
+    /**
+     Method to get FCL Current user
+     */
+    private func getCurrentUser(result: FlutterResult) {
+        do {
+            let response  = fcl.currentUser
+            let jsonResponse = try response?.json()
+            result(jsonResponse)
+        }catch {
+            print(error)
+            result(error.localizedDescription)
+        }
+    }
+    
+    /**
+     Method to Authenticate FCL user!
+     */
+    private func authenticateUser(result: FlutterResult) async {
+        do {
+            let response = try await fcl.authenticate()
+            result(response.addr.description)
+        }catch {
+            print(error);
+            result(error.localizedDescription)
+        }
+    }
+    
+    /**
+     Method to Log out FCL user!
+     */
+    private func unauthenticate(result: FlutterResult) async {
+        do {
+            try await fcl.unauthenticate()
+        }catch{
             print(error)
             result(error.localizedDescription)
         }
