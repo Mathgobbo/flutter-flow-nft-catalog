@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/NavigatorKeys.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
@@ -9,9 +12,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class Collection extends StatelessWidget {
-  const Collection({super.key});
+  Collection({super.key});
+
+  final webViewController = WebViewController();
 
   _launchUrl(String? url) async {
     try {
@@ -32,6 +38,11 @@ class Collection extends StatelessWidget {
     NFTCatalogMetadata? metadata =
         controller.collectionObserver.value.collection;
 
+    webViewController.loadHtmlString(
+        '<html><style>html,body {background: #C2185B;padding: 0;margin: 0;} img {width: 100vw; height: 100vh;}</style><body>' +
+            '<img src="${metadata?.collectionDisplay?.squareImage?.file?.url ?? ""}" /> ' +
+            '</body></html>');
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
@@ -49,8 +60,13 @@ class Collection extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(8)),
                   child: Image.network(
                     metadata?.collectionDisplay?.squareImage?.file?.url ?? "",
-                    errorBuilder: (context, error, stackTrace) =>
-                        const SizedBox(),
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: Get.size.width * 0.45,
+                      width: Get.size.width * 0.45,
+                      child: WebViewWidget(
+                        controller: webViewController,
+                      ),
+                    ),
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) {
                         return child;

@@ -21,6 +21,7 @@ class MainPageView extends StatelessWidget {
     Get.put(AccountNFTsController());
 
     PageViewController controller = Get.put(PageViewController());
+
     return Scaffold(
         appBar: AppBar(
           shadowColor: Colors.transparent,

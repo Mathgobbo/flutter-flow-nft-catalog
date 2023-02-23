@@ -5,6 +5,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
 import 'package:flutter_flow_nft_catalog/controllers/AccountNFTsController.dart';
 import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
+import 'package:flutter_flow_nft_catalog/modules/User/components/NFTCard.dart';
 import 'package:get/get.dart';
 
 class UserTabBar extends StatefulWidget {
@@ -65,7 +66,7 @@ class _UserTabBarState extends State<UserTabBar>
           children: [
             Obx(
               () => accountNFTsController.loading.value
-                  ? Center(
+                  ? const Center(
                       child: CircularProgressIndicator(
                         color: MainColors.green,
                       ),
@@ -76,37 +77,43 @@ class _UserTabBarState extends State<UserTabBar>
                           padding: const EdgeInsets.only(
                               top: 20.0, right: 20, left: 20),
                           child: accountNFTsController.nftsList.isNotEmpty
-                              ? ListView.separated(
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    if (index == 0) {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Total of NFTs: ${accountNFTsController.nftsList.length}',
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
-                                                color: MainColors.gray),
-                                          ),
-                                          const SizedBox(
-                                            height: 12,
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                    return Text(accountNFTsController
-                                            .nftsList.value[index].name ??
-                                        "");
-                                  },
-                                  separatorBuilder: (context, index) =>
+                              ? SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Total of NFTs: ${accountNFTsController.nftsList.length}',
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: MainColors.gray),
+                                      ),
                                       const SizedBox(
-                                    height: 12,
+                                        height: 12,
+                                      ),
+                                      GridView.builder(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                                                maxCrossAxisExtent: 200,
+                                                childAspectRatio: 0.89,
+                                                crossAxisSpacing: 16,
+                                                mainAxisSpacing: 16),
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          return NFTCard(
+                                              nft: accountNFTsController
+                                                  .nftsList.value[index]);
+                                        },
+                                        itemCount: accountNFTsController
+                                            .nftsList.length,
+                                      ),
+                                      const SizedBox(
+                                        height: 12,
+                                      )
+                                    ],
                                   ),
-                                  itemCount:
-                                      accountNFTsController.nftsList.length,
                                 )
                               : const Text("No collections found"),
                         ),
