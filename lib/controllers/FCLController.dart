@@ -131,7 +131,8 @@ class FCLController extends GetxController {
   /// Function to get Current user from FCL API and update Local User
   updateFCLCurrentUser() async {
     //final response = await platformChannel.invokeMethod("getCurrentUser");
-    final response = '{"addr": "0x9bbdjw3", "loggedIn": true, "keyId": 1}';
+    final response =
+        '{"addr": "0xb744ef45732acba0", "loggedIn": true, "keyId": 1}';
     if (response != null)
       observableUser.value = User.fromJson(jsonDecode(response));
     else

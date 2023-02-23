@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/AccountNFTsController.dart';
 import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/CatalogNavigator/page.dart';
@@ -17,6 +18,7 @@ class MainPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(FCLController());
+    Get.put(AccountNFTsController());
 
     PageViewController controller = Get.put(PageViewController());
     return Scaffold(

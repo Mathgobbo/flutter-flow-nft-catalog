@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/AccountNFTsController.dart';
 import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/User/components/LogInForm.dart';
 import 'package:flutter_flow_nft_catalog/modules/User/components/UserTabBar.dart';
@@ -96,7 +97,13 @@ class UserPageContent extends StatelessWidget {
                           width: 12,
                         ),
                         GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              if (fclController.isMainnet.value) {
+                                fclController.changeToTestnet();
+                              } else {
+                                fclController.changeToMainnet();
+                              }
+                            },
                             child: const Icon(
                               FeatherIcons.repeat,
                               size: 16,

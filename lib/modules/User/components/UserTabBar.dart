@@ -3,6 +3,9 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/AccountNFTsController.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
+import 'package:get/get.dart';
 
 class UserTabBar extends StatefulWidget {
   const UserTabBar({super.key});
@@ -19,6 +22,12 @@ class _UserTabBarState extends State<UserTabBar>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    final FCLController fclController = Get.find();
+
+    fclController.isMainnet.listen((isMainnet) {
+      AccountNFTsController accountNFTsController = Get.find();
+      accountNFTsController.getAccountNFTs();
+    });
   }
 
   @override
@@ -29,6 +38,7 @@ class _UserTabBarState extends State<UserTabBar>
 
   @override
   Widget build(BuildContext context) {
+    AccountNFTsController accountNFTsController = Get.find();
     return Column(
       children: [
         TabBar(
@@ -53,7 +63,54 @@ class _UserTabBarState extends State<UserTabBar>
             child: TabBarView(
           controller: _tabController,
           children: [
-            Text("NFTS"),
+            Obx(
+              () => accountNFTsController.loading.value
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: MainColors.green,
+                      ),
+                    )
+                  : accountNFTsController.error.value != ""
+                      ? Center(child: Text(accountNFTsController.error.value))
+                      : Padding(
+                          padding: const EdgeInsets.only(
+                              top: 20.0, right: 20, left: 20),
+                          child: accountNFTsController.nftsList.isNotEmpty
+                              ? ListView.separated(
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Total of NFTs: ${accountNFTsController.nftsList.length}',
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color: MainColors.gray),
+                                          ),
+                                          const SizedBox(
+                                            height: 12,
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                    return Text(accountNFTsController
+                                            .nftsList.value[index].name ??
+                                        "");
+                                  },
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(
+                                    height: 12,
+                                  ),
+                                  itemCount:
+                                      accountNFTsController.nftsList.length,
+                                )
+                              : const Text("No collections found"),
+                        ),
+            ),
             Center(
               child: Text("Coming Soon!"),
             )

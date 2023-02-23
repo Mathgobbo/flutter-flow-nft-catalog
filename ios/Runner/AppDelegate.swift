@@ -84,11 +84,11 @@ import FCL
                    provider: fcl.currentProvider ?? .lilico)
         if(network == .mainnet){
             fcl.config.put("0xNFTCatalog", value: "0x49a7cda3a1eecc29")
-            fcl.config.put("0xMetadataViews", value: "0x49a7cda3a1eecc29")
+            fcl.config.put("0xMetadataViews", value: "0x1d7e57aa55817448")
             fcl.config.put("0xNFTRetrieval", value: "0x49a7cda3a1eecc29")
         }else if (network == .testnet){
             fcl.config.put("0xNFTCatalog", value: "0x324c34e1c517e4db")
-            fcl.config.put("0xMetadataViews", value: "0x324c34e1c517e4db")
+            fcl.config.put("0xMetadataViews", value: "0x631e88ae7f1d7c20")
             fcl.config.put("0xNFTRetrieval", value: "0x324c34e1c517e4db")
         }
     }
