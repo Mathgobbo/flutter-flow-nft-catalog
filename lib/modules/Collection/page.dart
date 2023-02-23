@@ -39,9 +39,7 @@ class Collection extends StatelessWidget {
         controller.collectionObserver.value.collection;
 
     webViewController.loadHtmlString(
-        '<html><style>html,body {background: #C2185B;padding: 0;margin: 0;} img {width: 100vw; height: 100vh;}</style><body>' +
-            '<img src="${metadata?.collectionDisplay?.squareImage?.file?.url ?? ""}" /> ' +
-            '</body></html>');
+        '<html><style>html,body {background: #FFF;padding: 0;margin: 0;} img {width: 100vw; height: 100vh;}</style><body><img src="${metadata?.collectionDisplay?.squareImage?.file?.url ?? ""}" /> </body></html>');
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

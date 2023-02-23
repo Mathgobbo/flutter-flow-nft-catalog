@@ -93,7 +93,8 @@ class _UserTabBarState extends State<UserTabBar>
                                         height: 12,
                                       ),
                                       GridView.builder(
-                                        physics: NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         gridDelegate:
                                             const SliverGridDelegateWithMaxCrossAxisExtent(
                                                 maxCrossAxisExtent: 200,
@@ -118,7 +119,7 @@ class _UserTabBarState extends State<UserTabBar>
                               : const Text("No collections found"),
                         ),
             ),
-            Center(
+            const Center(
               child: Text("Coming Soon!"),
             )
           ],

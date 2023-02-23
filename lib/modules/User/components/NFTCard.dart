@@ -64,7 +64,7 @@ class NFTCard extends StatelessWidget {
   _openBottomSheet() {
     final webViewController = WebViewController();
     webViewController.loadHtmlString(
-        '<html><style>html,body {background: #C2185B;padding: 0;margin: 0;} img {width: 100vw; height: 100vh;}</style><body><img src="${nft.collectionSquareImage ?? ""}" /> </body></html>');
+        '<html><style>html,body {background: #FFF;padding: 0;margin: 0;} img {width: 100vw; height: 100vh;}</style><body><img src="${nft.collectionSquareImage ?? ""}" /> </body></html>');
 
     Get.bottomSheet(
       SingleChildScrollView(
