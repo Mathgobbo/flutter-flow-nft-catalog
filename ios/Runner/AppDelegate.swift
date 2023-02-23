@@ -53,6 +53,10 @@ import FCL
                 Task {
                     await self.unauthenticate(result:result);
                 }
+            }else if (call.method == "getAccountNFTs") {
+                Task {
+                    await self.getAccountNFTs(result: result, call: call)
+                }
             } else {
                 result(FlutterMethodNotImplemented)
                 return
@@ -80,8 +84,12 @@ import FCL
                    provider: fcl.currentProvider ?? .lilico)
         if(network == .mainnet){
             fcl.config.put("0xNFTCatalog", value: "0x49a7cda3a1eecc29")
+            fcl.config.put("0xMetadataViews", value: "0x49a7cda3a1eecc29")
+            fcl.config.put("0xNFTRetrieval", value: "0x49a7cda3a1eecc29")
         }else if (network == .testnet){
             fcl.config.put("0xNFTCatalog", value: "0x324c34e1c517e4db")
+            fcl.config.put("0xMetadataViews", value: "0x324c34e1c517e4db")
+            fcl.config.put("0xNFTRetrieval", value: "0x324c34e1c517e4db")
         }
     }
     
@@ -187,6 +195,156 @@ import FCL
         do {
             try await fcl.unauthenticate()
         }catch{
+            print(error)
+            result(error.localizedDescription)
+        }
+    }
+    
+    
+    /**
+     Method to get all NFTs from an account
+     */
+    var getAccountNFTsScript = """
+    import MetadataViews from 0xMetadataViews
+    import NFTCatalog from 0xNFTCatalog
+    import NFTRetrieval from 0xNFTRetrieval
+
+    pub struct NFT {
+        pub let id: UInt64
+        pub let name: String
+        pub let description: String
+        pub let thumbnail: String
+        pub let externalURL: String
+        pub let storagePath: StoragePath
+        pub let publicPath: PublicPath
+        pub let privatePath: PrivatePath
+        pub let publicLinkedType: Type
+        pub let privateLinkedType: Type
+        pub let collectionName: String
+        pub let collectionDescription: String
+        pub let collectionSquareImage: String
+        pub let collectionBannerImage: String
+        pub let collectionExternalURL: String
+        pub let royalties: [MetadataViews.Royalty]
+
+        init(
+            id: UInt64,
+            name: String,
+            description: String,
+            thumbnail: String,
+            externalURL: String,
+            storagePath: StoragePath,
+            publicPath: PublicPath,
+            privatePath: PrivatePath,
+            publicLinkedType: Type,
+            privateLinkedType: Type,
+            collectionName: String,
+            collectionDescription: String,
+            collectionSquareImage: String,
+            collectionBannerImage: String,
+            collectionExternalURL: String,
+            royalties: [MetadataViews.Royalty]
+        ) {
+            self.id = id
+            self.name = name
+            self.description = description
+            self.thumbnail = thumbnail
+            self.externalURL = externalURL
+            self.storagePath = storagePath
+            self.publicPath = publicPath
+            self.privatePath = privatePath
+            self.publicLinkedType = publicLinkedType
+            self.privateLinkedType = privateLinkedType
+            self.collectionName = collectionName
+            self.collectionDescription = collectionDescription
+            self.collectionSquareImage = collectionSquareImage
+            self.collectionBannerImage = collectionBannerImage
+            self.collectionExternalURL = collectionExternalURL
+            self.royalties = royalties
+        }
+    }
+
+    pub fun main(ownerAddress: Address): {String: [NFT]} {
+        let catalog = NFTCatalog.getCatalog()
+        let account = getAuthAccount(ownerAddress)
+        let items: [MetadataViews.NFTView] = []
+        let data: {String: [NFT]} = {}
+
+        for key in catalog.keys {
+            let value = catalog[key]!
+            let keyHash = String.encodeHex(HashAlgorithm.SHA3_256.hash(key.utf8))
+            let tempPathStr = "catalog".concat(keyHash)
+            let tempPublicPath = PublicPath(identifier: tempPathStr)!
+
+            account.link<&{MetadataViews.ResolverCollection}>(
+                tempPublicPath,
+                target: value.collectionData.storagePath
+            )
+
+            let collectionCap = account.getCapability<&AnyResource{MetadataViews.ResolverCollection}>(tempPublicPath)
+
+            if !collectionCap.check() {
+                continue
+            }
+
+            let views = NFTRetrieval.getNFTViewsFromCap(collectionIdentifier: key, collectionCap: collectionCap)
+            let items: [NFT] = []
+
+            for view in views {
+                let displayView = view.display
+                let externalURLView = view.externalURL
+                let collectionDataView = view.collectionData
+                let collectionDisplayView = view.collectionDisplay
+                let royaltyView = view.royalties
+
+                if (displayView == nil || externalURLView == nil || collectionDataView == nil || collectionDisplayView == nil || royaltyView == nil) {
+                    // Bad NFT. Skipping....
+                    continue
+                }
+
+                items.append(
+                    NFT(
+                        id: view.id,
+                        name: displayView!.name,
+                        description: displayView!.description,
+                        thumbnail: displayView!.thumbnail.uri(),
+                        externalURL: externalURLView!.url,
+                        storagePath: collectionDataView!.storagePath,
+                        publicPath: collectionDataView!.publicPath,
+                        privatePath: collectionDataView!.providerPath,
+                        publicLinkedType: collectionDataView!.publicLinkedType,
+                        privateLinkedType: collectionDataView!.providerLinkedType,
+                        collectionName: collectionDisplayView!.name,
+                        collectionDescription: collectionDisplayView!.description,
+                        collectionSquareImage: collectionDisplayView!.squareImage.file.uri(),
+                        collectionBannerImage: collectionDisplayView!.bannerImage.file.uri(),
+                        collectionExternalURL: collectionDisplayView!.externalURL.url,
+                        royalties: royaltyView!.getRoyalties()
+                    )
+                )
+            }
+
+            data[key] = items
+        }
+
+        return data
+    }
+"""
+    private func getAccountNFTs(result: FlutterResult, call: FlutterMethodCall) async {
+        do {
+            let args = call.arguments as! Dictionary<String, Any>
+            let addr = args["address"] as! String
+            
+            let response = try await fcl.query {
+                cadence {
+                    getAccountNFTsScript
+                }
+                arguments{
+                    [.address(Flow.Address(hex: addr))]
+                }
+            }.decode()
+            result(response)
+        }catch {
             print(error)
             result(error.localizedDescription)
         }
