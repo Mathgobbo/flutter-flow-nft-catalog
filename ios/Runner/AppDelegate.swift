@@ -66,6 +66,10 @@ import FCL
                 Task {
                     await self.getAccountBeyondAffiliate(result: result, call: call)
                 }
+            }else if(call.method == "mintBeyondNFT") {
+                Task {
+                    await self.mintBeyondNFT(result: result)
+                }
             }else {
                 result(FlutterMethodNotImplemented)
                 return
@@ -96,17 +100,20 @@ import FCL
             fcl.config.put("0xCustomNonFungibleToken", value: "0x1d7e57aa55817448")
             fcl.config.put("0xMetadataViews", value: "0x1d7e57aa55817448")
             fcl.config.put("0xNFTRetrieval", value: "0x49a7cda3a1eecc29")
+            fcl.config.put("0xFlowToken", value: "0x1654653399040a61")
         }else if (network == .testnet){
             fcl.config.put("0xNFTCatalog", value: "0x324c34e1c517e4db")
             fcl.config.put("0xCustomNonFungibleToken", value: "0x631e88ae7f1d7c20")
             fcl.config.put("0xMetadataViews", value: "0x631e88ae7f1d7c20")
             fcl.config.put("0xNFTRetrieval", value: "0x324c34e1c517e4db")
+            fcl.config.put("0xFlowToken", value: "0x7e60df042a9c0868")
         }else if(network == .emulator){
             fcl.config.put("0xNFTCatalog", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xCustomNonFungibleToken", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xMetadataViews", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xNFTRetrieval", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xBeyond", value: "0xf8d6e0586b0a20c7")
+            fcl.config.put("0xFlowToken", value: "0x0ae53cb6e3f42a79")
         }
     }
     
@@ -406,6 +413,61 @@ import FCL
                 }
             }.decode()
             result(response)
+        }catch{
+            print(error)
+            result(error.localizedDescription)
+        }
+    }
+    
+    
+    /**
+        Method to mint an Beyond Affiliate NFT
+     */
+    var mintBeyondNFTScript = """
+    import NonFungibleToken from 0xNonFungibleToken
+    import MetadataViews from 0xMetadataViews
+    import FlowToken from 0xFlowToken
+    import Beyond from 0xBeyond
+
+    transaction(mintPrice: UFix64) {
+
+        let buyerCollection: &{NonFungibleToken.CollectionPublic}
+        let mintPrice: UFix64
+        let buyerPaymentVault: &FlowToken.Vault
+
+        prepare(signer: AuthAccount) {
+
+            self.mintPrice = mintPrice
+
+            if signer.borrow<&Beyond.Collection>(from: Beyond.CollectionStoragePath) == nil {
+                signer.save(<-Beyond.createEmptyCollection(), to: Beyond.CollectionStoragePath)
+            }
+
+            if signer.getLinkTarget(Beyond.CollectionPublicPath) == nil {
+                signer.link<&Beyond.Collection{Beyond.BeyondNFTCollectionPublic, NonFungibleToken.CollectionPublic}>(Beyond.CollectionPublicPath, target: Beyond.CollectionStoragePath)
+            }
+
+            self.buyerCollection = signer.borrow<&Beyond.Collection{NonFungibleToken.CollectionPublic}>(
+                from: Beyond.CollectionStoragePath
+            ) ?? panic("Cannot borrow Beyond collection receiver capability from signer")
+
+            self.buyerPaymentVault = signer.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
+                ?? panic("Can't borrow the Flow Token vault for the main payment from acct storage")
+        }
+
+        execute {
+            Beyond.mintNFT(
+                recipient: self.buyerCollection,
+                payment: <- self.buyerPaymentVault.withdraw(amount: self.mintPrice)
+            )
+        }
+    }
+     
+ """
+    private func mintBeyondNFT(result: FlutterResult) async {
+        do {
+            let txId = try await fcl.mutate(cadence: mintBeyondNFTScript, args: [.ufix64(1)])
+            result(txId.hex)
         }catch{
             print(error)
             result(error.localizedDescription)
