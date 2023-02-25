@@ -43,6 +43,11 @@ import FCL
                     self.initFCL(network: .testnet)
                     result(nil)
                 }
+            }else if (call.method == "changeToEmulator") {
+                if(fcl.currentEnv != .emulator){
+                    self.initFCL(network: .emulator)
+                    result(nil)
+                }
             }else if(call.method == "getCurrentUser"){
                 self.getCurrentUser(result: result);
             }else if(call.method == "authenticate") {
@@ -57,7 +62,11 @@ import FCL
                 Task {
                     await self.getAccountNFTs(result: result, call: call)
                 }
-            } else {
+            } else if (call.method == "getAccountBeyondAffiliate") {
+                Task {
+                    await self.getAccountBeyondAffiliate(result: result, call: call)
+                }
+            }else {
                 result(FlutterMethodNotImplemented)
                 return
             }
@@ -84,12 +93,20 @@ import FCL
                    provider: fcl.currentProvider ?? .lilico)
         if(network == .mainnet){
             fcl.config.put("0xNFTCatalog", value: "0x49a7cda3a1eecc29")
+            fcl.config.put("0xCustomNonFungibleToken", value: "0x1d7e57aa55817448")
             fcl.config.put("0xMetadataViews", value: "0x1d7e57aa55817448")
             fcl.config.put("0xNFTRetrieval", value: "0x49a7cda3a1eecc29")
         }else if (network == .testnet){
             fcl.config.put("0xNFTCatalog", value: "0x324c34e1c517e4db")
+            fcl.config.put("0xCustomNonFungibleToken", value: "0x631e88ae7f1d7c20")
             fcl.config.put("0xMetadataViews", value: "0x631e88ae7f1d7c20")
             fcl.config.put("0xNFTRetrieval", value: "0x324c34e1c517e4db")
+        }else if(network == .emulator){
+            fcl.config.put("0xNFTCatalog", value: "0xf8d6e0586b0a20c7")
+            fcl.config.put("0xCustomNonFungibleToken", value: "0xf8d6e0586b0a20c7")
+            fcl.config.put("0xMetadataViews", value: "0xf8d6e0586b0a20c7")
+            fcl.config.put("0xNFTRetrieval", value: "0xf8d6e0586b0a20c7")
+            fcl.config.put("0xBeyond", value: "0xf8d6e0586b0a20c7")
         }
     }
     
@@ -345,6 +362,51 @@ import FCL
             }.decode()
             result(response)
         }catch {
+            print(error)
+            result(error.localizedDescription)
+        }
+    }
+    
+    
+    /**
+     Method to verify if user already has Affiliate NFT
+     */
+    
+    var getAccountBeyondAffiliateScript = """
+     import Beyond from 0xBeyond
+     import NonFungibleToken from 0xCustomNonFungibleToken
+     import MetadataViews from 0xMetadataViews
+     
+     pub fun main(address: Address): Beyond.Affiliate? {
+         let beyondCollectionPublicCap = getAccount(address).getCapability<&Beyond.Collection{NonFungibleToken.CollectionPublic, Beyond.BeyondNFTCollectionPublic, MetadataViews.ResolverCollection}>(Beyond.CollectionPublicPath)
+         let beyondCollection = beyondCollectionPublicCap.borrow()
+         if(beyondCollection == nil) {
+             return nil
+         }
+         
+         let ids = beyondCollection?.getIDs()
+         if(ids == nil || ids?.length == 0){
+             return nil
+         }
+     
+     
+         return Beyond.getAffiliateByAddress(address: address)
+     }
+ """
+    private func getAccountBeyondAffiliate(result: FlutterResult, call: FlutterMethodCall) async{
+        do {
+            let args = call.arguments as! Dictionary<String, Any>
+            let addr = args["address"] as! String
+            let response = try await fcl.query {
+                cadence {
+                    getAccountBeyondAffiliateScript
+                }
+                arguments {
+                    [.address(Flow.Address(hex: addr))]
+                }
+            }.decode()
+            result(response)
+        }catch{
             print(error)
             result(error.localizedDescription)
         }

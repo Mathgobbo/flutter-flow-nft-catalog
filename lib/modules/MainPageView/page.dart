@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
 import 'package:flutter_flow_nft_catalog/controllers/AccountNFTsController.dart';
+import 'package:flutter_flow_nft_catalog/controllers/AffiliateDetailsController.dart';
 import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_flow_nft_catalog/modules/Catalog/page.dart';
 import 'package:flutter_flow_nft_catalog/modules/CatalogNavigator/page.dart';
@@ -19,6 +20,7 @@ class MainPageView extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(FCLController());
     Get.put(AccountNFTsController());
+    Get.put(AffiliateDetailsController());
 
     PageViewController controller = Get.put(PageViewController());
 
@@ -49,8 +51,8 @@ class MainPageView extends StatelessWidget {
         body: SafeArea(
           child: PageView(
             controller: controller.pageController,
-            children: const [Home(), CatalogNavigator(), UserPage()],
             onPageChanged: controller.onPageChanged,
+            children: const [Home(), CatalogNavigator(), UserPage()],
           ),
         ));
   }

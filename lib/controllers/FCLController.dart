@@ -62,7 +62,7 @@ class FCLController extends GetxController {
   changeToTestnet() async {
     try {
       isMainnet.value = false;
-      await platformChannel.invokeMethod("changeToTestnet");
+      await platformChannel.invokeMethod("changeToEmulator");
       await getCatalog();
     } catch (e) {
       print(e);
@@ -122,7 +122,7 @@ class FCLController extends GetxController {
   updateFCLCurrentUser() async {
     //final response = await platformChannel.invokeMethod("getCurrentUser");
     final response =
-        '{"addr": "0xb744ef45732acba0", "loggedIn": true, "keyId": 1}';
+        '{"addr": "0xf8d6e0586b0a20c7", "loggedIn": true, "keyId": 1}';
     if (response != null)
       observableUser.value = User.fromJson(jsonDecode(response));
     else
