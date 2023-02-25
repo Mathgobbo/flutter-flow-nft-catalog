@@ -91,10 +91,10 @@ import FCL
                                     location: URL(string: "https://flow.org")!,
                                     accountProof: accountProof,
                                     walletConnectConfig: walletConnect)
-        
         fcl.config(metadata: metadata,
                    env: network,
                    provider: fcl.currentProvider ?? .lilico)
+        
         if(network == .mainnet){
             fcl.config.put("0xNFTCatalog", value: "0x49a7cda3a1eecc29")
             fcl.config.put("0xCustomNonFungibleToken", value: "0x1d7e57aa55817448")

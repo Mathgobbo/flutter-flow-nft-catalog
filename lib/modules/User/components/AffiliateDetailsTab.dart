@@ -47,7 +47,7 @@ class AffiliateDetailsTab extends StatelessWidget {
                             height: 8,
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: affiliateDetailsController.mintBeyondNFT,
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: MainColors.green,
                                 padding: const EdgeInsets.symmetric(

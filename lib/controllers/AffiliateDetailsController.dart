@@ -32,6 +32,7 @@ class AffiliateDetailsController extends GetxController {
       if (loggedUser == null || fclController.isMainnet.value) return;
       final txId =
           await fclController.platformChannel.invokeMethod("mintBeyondNFT");
+      if (txId == "unauthenticated") throw txId;
       print(txId);
     } catch (e) {
       print(e);
