@@ -9,4 +9,5 @@ void main() => runApp(GetMaterialApp(
       initialRoute: MAIN,
       getPages: routes,
       theme: ThemeData(),
+      debugShowCheckedModeBanner: false,
     ));
