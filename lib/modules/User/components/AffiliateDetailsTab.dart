@@ -2,18 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_flow_nft_catalog/Theme.dart';
+import 'package:flutter_flow_nft_catalog/controllers/AccountNFTsController.dart';
 import 'package:flutter_flow_nft_catalog/controllers/AffiliateDetailsController.dart';
+import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class AffiliateDetailsTab extends StatelessWidget {
+class AffiliateDetailsTab extends StatefulWidget {
   const AffiliateDetailsTab({super.key});
+
+  @override
+  State<AffiliateDetailsTab> createState() => _AffiliateDetailsTabState();
+}
+
+class _AffiliateDetailsTabState extends State<AffiliateDetailsTab> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FCLController fclController = Get.find();
+    AffiliateDetailsController affiliateDetailsController = Get.find();
+
+    fclController.observableUser.listen((user) {
+      if (user != null) {
+        affiliateDetailsController.getAffiliateDetails();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final AffiliateDetailsController affiliateDetailsController = Get.find();
-    affiliateDetailsController.getAffiliateDetails();
 
     return Obx(
       () => affiliateDetailsController.error.value != ""

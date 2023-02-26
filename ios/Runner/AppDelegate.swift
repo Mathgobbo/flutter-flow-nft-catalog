@@ -94,6 +94,7 @@ import FCL
         fcl.config(metadata: metadata,
                    env: network,
                    provider: fcl.currentProvider ?? .lilico)
+    
         
         if(network == .mainnet){
             fcl.config.put("0xNFTCatalog", value: "0x49a7cda3a1eecc29")
@@ -107,6 +108,7 @@ import FCL
             fcl.config.put("0xMetadataViews", value: "0x631e88ae7f1d7c20")
             fcl.config.put("0xNFTRetrieval", value: "0x324c34e1c517e4db")
             fcl.config.put("0xFlowToken", value: "0x7e60df042a9c0868")
+            fcl.config.put("0xBeyond", value: "0x8294d1ec28f6ce7c")
         }else if(network == .emulator){
             fcl.config.put("0xNFTCatalog", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xCustomNonFungibleToken", value: "0xf8d6e0586b0a20c7")
@@ -114,6 +116,7 @@ import FCL
             fcl.config.put("0xNFTRetrieval", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xBeyond", value: "0xf8d6e0586b0a20c7")
             fcl.config.put("0xFlowToken", value: "0x0ae53cb6e3f42a79")
+            fcl.config.put("discovery.wallet", value: "http://localhost:8701/fcl/authn")
         }
     }
     
@@ -218,6 +221,7 @@ import FCL
     private func unauthenticate(result: FlutterResult) async {
         do {
             try await fcl.unauthenticate()
+            result(nil)
         }catch{
             print(error)
             result(error.localizedDescription)
@@ -384,26 +388,28 @@ import FCL
      import NonFungibleToken from 0xCustomNonFungibleToken
      import MetadataViews from 0xMetadataViews
      
-     pub fun main(address: Address): Beyond.Affiliate? {
-         let beyondCollectionPublicCap = getAccount(address).getCapability<&Beyond.Collection{NonFungibleToken.CollectionPublic, Beyond.BeyondNFTCollectionPublic, MetadataViews.ResolverCollection}>(Beyond.CollectionPublicPath)
-         let beyondCollection = beyondCollectionPublicCap.borrow()
-         if(beyondCollection == nil) {
-             return nil
-         }
-         
-         let ids = beyondCollection?.getIDs()
-         if(ids == nil || ids?.length == 0){
-             return nil
-         }
-     
-     
-         return Beyond.getAffiliateByAddress(address: address)
+      pub fun main(address: Address): Beyond.Affiliate? {
+              let beyondCollectionPublicCap = getAccount(address).getCapability<&Beyond.Collection{NonFungibleToken.CollectionPublic, Beyond.BeyondNFTCollectionPublic}>(Beyond.CollectionPublicPath)
+              let beyondCollection = beyondCollectionPublicCap.borrow()
+              if(beyondCollection == nil) {
+                  return nil
+              }
+              
+              let ids = beyondCollection?.getIDs()
+              if(ids == nil || ids?.length == 0){
+                  return nil
+              }
+          
+          
+              return Beyond.getAffiliateByAddress(address: address)
+          
      }
  """
     private func getAccountBeyondAffiliate(result: FlutterResult, call: FlutterMethodCall) async{
         do {
             let args = call.arguments as! Dictionary<String, Any>
             let addr = args["address"] as! String
+            print(addr)
             let response = try await fcl.query {
                 cadence {
                     getAccountBeyondAffiliateScript
@@ -429,7 +435,7 @@ import FCL
     import FlowToken from 0xFlowToken
     import Beyond from 0xBeyond
 
-    transaction(mintPrice: UFix64) {
+    transaction() {
 
         let buyerCollection: &{NonFungibleToken.CollectionPublic}
         let mintPrice: UFix64
@@ -437,7 +443,7 @@ import FCL
 
         prepare(signer: AuthAccount) {
 
-            self.mintPrice = mintPrice
+            self.mintPrice = 1.0
 
             if signer.borrow<&Beyond.Collection>(from: Beyond.CollectionStoragePath) == nil {
                 signer.save(<-Beyond.createEmptyCollection(), to: Beyond.CollectionStoragePath)
@@ -466,8 +472,10 @@ import FCL
  """
     private func mintBeyondNFT(result: FlutterResult) async {
         do {
-            let txId = try await fcl.mutate(cadence: mintBeyondNFTScript, args: [.ufix64(1)])
-            result(txId.hex)
+            let txId = try await fcl.mutate(cadence: mintBeyondNFTScript)
+            let txSealed = try await txId.onceSealed()
+            
+            result(["txId": txId.hex, "status": try txSealed.status.json(), "errorMessage": txSealed.errorMessage])
         }catch{
             print(error)
             result(error.localizedDescription)

@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_flow_nft_catalog/controllers/FCLController.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +34,10 @@ class AffiliateDetailsController extends GetxController {
       final txId =
           await fclController.platformChannel.invokeMethod("mintBeyondNFT");
       if (txId == "unauthenticated") throw txId;
-      print(txId);
+      if (txId["errorMessage"] != null && txId["errorMessage"] != "") {
+        Get.snackbar("Transaction Error", txId["errorMessage"]);
+      }
+      getAffiliateDetails();
     } catch (e) {
       print(e);
       error.value = e.toString();
