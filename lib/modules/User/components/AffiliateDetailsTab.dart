@@ -9,31 +9,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class AffiliateDetailsTab extends StatefulWidget {
+class AffiliateDetailsTab extends StatelessWidget {
   const AffiliateDetailsTab({super.key});
-
-  @override
-  State<AffiliateDetailsTab> createState() => _AffiliateDetailsTabState();
-}
-
-class _AffiliateDetailsTabState extends State<AffiliateDetailsTab> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    FCLController fclController = Get.find();
-    AffiliateDetailsController affiliateDetailsController = Get.find();
-
-    fclController.observableUser.listen((user) {
-      if (user != null) {
-        affiliateDetailsController.getAffiliateDetails();
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final AffiliateDetailsController affiliateDetailsController = Get.find();
+    affiliateDetailsController.getAffiliateDetails();
 
     return Obx(
       () => affiliateDetailsController.error.value != ""
@@ -176,14 +158,17 @@ class _AffiliateDetailsTabState extends State<AffiliateDetailsTab> {
                                 fontWeight: FontWeight.w600),
                           ),
                           Text(
-                            DateFormat('MM/dd/yyyy').format(
+                            affiliateDetailsController
+                                        .affiliateDetails.value?["created"] ==
+                                    null
+                                ? ""
+                                : DateFormat('MM/dd/yyyy').format(
                                     DateTime.fromMillisecondsSinceEpoch(
                                         affiliateDetailsController
                                                 .affiliateDetails
                                                 .value?["created"]
                                                 .round() *
-                                            1000)) ??
-                                "",
+                                            1000)),
                             style: const TextStyle(
                                 color: MainColors.black,
                                 fontWeight: FontWeight.w600,

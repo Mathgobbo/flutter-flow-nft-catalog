@@ -16,22 +16,9 @@ class AccountNFTsTab extends StatefulWidget {
 
 class _AccountNFTsTabState extends State<AccountNFTsTab> {
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    FCLController fclController = Get.find();
-    AccountNFTsController accountNFTsController = Get.find();
-
-    fclController.observableUser.listen((user) {
-      if (user != null) {
-        accountNFTsController.getAccountNFTs();
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     AccountNFTsController accountNFTsController = Get.find();
+    accountNFTsController.getAccountNFTs();
     return Obx(
       () => accountNFTsController.loading.value
           ? const Center(
